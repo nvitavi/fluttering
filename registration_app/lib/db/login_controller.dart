@@ -1,4 +1,4 @@
-import 'package:registration_app/model/User.dart';
+import 'package:registration_app/model/user.dart';
 import 'dart:async';
 import 'package:registration_app/db/database_helper.dart';
 

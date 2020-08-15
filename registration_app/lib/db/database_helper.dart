@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'package:registration_app/model/User.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'package:registration_app/model/user.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = new DatabaseHelper.internal();
@@ -24,6 +26,8 @@ class DatabaseHelper {
   DatabaseHelper.internal();
 
   initDb() async {
+
+    WidgetsFlutterBinding.ensureInitialized();
     Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, "data_flutter.db");
 

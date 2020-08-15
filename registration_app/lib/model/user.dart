@@ -1,6 +1,4 @@
 
-import 'dart:html';
-
 class User {
   int _id;
   String _firstName;

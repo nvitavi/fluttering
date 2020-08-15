@@ -1,10 +1,9 @@
 import 'dart:html';
 
-import 'package:registration_app/model/User.dart';
+import 'package:registration_app/model/user.dart';
 import 'package:registration_app/db/login_request.dart';
 
 abstract class LoginCallBack {
-  void onSaveSuccess(int result);
   void onLoginSuccess(User user);
   void onError(String error);
 }

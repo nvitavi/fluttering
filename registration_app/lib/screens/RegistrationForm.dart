@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:registration_app/screens/LoginScreen.dart';
 import 'package:registration_app/screens/AnimatedProgressIndicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:registration_app/model/User.dart';
+import 'package:registration_app/model/user.dart';
 import 'package:registration_app/db/save_response.dart';
 
 class RegistrationForm extends StatefulWidget {
@@ -12,21 +12,14 @@ class RegistrationForm extends StatefulWidget {
   _RegistrationForm createState() => _RegistrationForm();
 }
 
-enum LoginStatus { notSignIn, signIn }
-
-class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack {
-
-  void _showDisplayScreen() {
-  }
-
+class _RegistrationForm extends State<RegistrationForm>
+    implements SaveCallBack {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   final _firstNameTextController = TextEditingController();
   final _lastNameTextController = TextEditingController();
   final _imageTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
   final _confirmTextController = TextEditingController();
-
-  LoginStatus _loginStatus = LoginStatus.notSignIn;
 
   double _formProgress = 0;
 
@@ -54,6 +47,10 @@ class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack 
     _form.currentState.validate();
   }
 
+  BuildContext _ctx;
+  bool _isLoading = false;
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
+
   String _firstName, _lastName, _password, _image;
 
   SaveResponse _response;
@@ -67,30 +64,22 @@ class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack 
 
     if (form.validate()) {
       setState(() {
+        _isLoading = true;
         form.save();
         _response.doSave(_firstName, _lastName, _password, _image);
       });
     }
   }
 
-  var value;
-  getPref() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      value = preferences.getInt("value");
-
-      _loginStatus = value == 1 ? LoginStatus.signIn : LoginStatus.notSignIn;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getPref();
+  void _showSnackBar(String text) {
+    scaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(text),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    _ctx = context;
     return Form(
       key: _form,
       onChanged: _updateFormProgress,
@@ -115,21 +104,21 @@ class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack 
               onSaved: (val) => _lastName = val,
             ),
           ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            showImage(),
-            RaisedButton(
-              child: Text("Select Image from Gallery"),
-              onPressed: () {
-                pickImageFromGallery(ImageSource.gallery);
-              },
+          /*Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                showImage(),
+                RaisedButton(
+                  child: Text("Select Image from Gallery"),
+                  onPressed: () {
+                    pickImageFromGallery(ImageSource.gallery);
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),*/
           Padding(
             padding: EdgeInsets.all(8.0),
             child: TextFormField(
@@ -147,7 +136,8 @@ class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack 
                 onSaved: (val) => _password = val,
                 validator: (val) {
                   if (val.isEmpty) return 'Empty';
-                  if (val != _passwordTextController.text) return 'Passwords need to match';
+                  if (val != _passwordTextController.text)
+                    return 'Passwords need to match';
                   return null;
                 }),
           ),
@@ -198,16 +188,20 @@ class _RegistrationForm extends State<RegistrationForm> implements SaveCallBack 
 
   @override
   void onError(String error) {
-    // TODO: implement onError
+    print(error);
+    /*_showSnackBar(error);
+    setState(() {
+      _isLoading = false;
+    });*/
   }
 
   @override
-  void onSaveSuccess(int result) async  {
-    if(result > 1){
+  void onSaveSuccess(int result) async {
+    //if (result > 1) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
       );
-    }
+    //}
   }
 }
