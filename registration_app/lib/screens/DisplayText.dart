@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:registration_app/model/user.dart';
 
 class DisplayText extends StatelessWidget {
+
+  final User user;
+
+  DisplayText({Key key, @required this.user}) : super(key: key);
+
   double _lableFontSize = 20.0;
   double _valueFontSize = 15.0;
 
@@ -16,7 +22,7 @@ class DisplayText extends StatelessWidget {
                 style: TextStyle(fontSize: _lableFontSize, color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
-                      text: "Value",
+                      text: user.firstName,
                       style: TextStyle(
                           fontSize: _valueFontSize,
                           color: Colors.black,
@@ -32,7 +38,7 @@ class DisplayText extends StatelessWidget {
                 style: TextStyle(fontSize: _lableFontSize, color: Colors.black),
                 children: <TextSpan>[
                   TextSpan(
-                      text: "Value",
+                      text: user.lastName,
                       style: TextStyle(
                           fontSize: _valueFontSize,
                           color: Colors.black,

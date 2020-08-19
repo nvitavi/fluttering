@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:registration_app/model/user.dart';
 import 'package:registration_app/screens/DisplayText.dart';
 
 class DisplayScreen extends StatelessWidget {
+
+  final User user;
+
+  DisplayScreen({Key key, @required this.user}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +19,7 @@ class DisplayScreen extends StatelessWidget {
         child: SizedBox(
           width: 400,
           child: Card(
-            child: DisplayText(),
+            child: DisplayText(user: user),
           ),
         ),
       ),

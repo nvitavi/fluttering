@@ -7,13 +7,13 @@ class LoginCtr {
 
   Future<int> saveUser(User user) async {
     var dbClient = await con.db;
-    int res = await dbClient.insert("User", user.toMap());
+    int res = await dbClient.insert("user", user.toMap());
     return res;
   }
 
   Future<int> deleteUser(User user) async {
     var dbClient = await con.db;
-    int res = await dbClient.delete("User");
+    int res = await dbClient.delete("user");
     return res;
   }
 

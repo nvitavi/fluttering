@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:registration_app/screens/LoginScreen.dart';
 import 'package:registration_app/screens/AnimatedProgressIndicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:registration_app/model/user.dart';
 import 'package:registration_app/db/save_response.dart';
+
+import 'DisplayScreen.dart';
 
 class RegistrationForm extends StatefulWidget {
   @override
@@ -44,7 +44,7 @@ class _RegistrationForm extends State<RegistrationForm>
     });
 
     // To validate password field
-    _form.currentState.validate();
+    //_form.currentState.validate();
   }
 
   BuildContext _ctx;
@@ -66,7 +66,7 @@ class _RegistrationForm extends State<RegistrationForm>
       setState(() {
         _isLoading = true;
         form.save();
-        _response.doSave(_firstName, _lastName, _password, _image);
+        _response.doSave(_firstName, _lastName, _password);
       });
     }
   }
@@ -188,20 +188,38 @@ class _RegistrationForm extends State<RegistrationForm>
 
   @override
   void onError(String error) {
+    print("error occurred in db: " + error);
+  }
+
+  @override
+  void onSaveSuccess(User result) {
+    if(result != null){
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DisplayScreen(user: result)),
+      );
+    } else {
+
+    }
+  }
+
+/*  @override
+  void onError(String error) {
     print(error);
-    /*_showSnackBar(error);
+    *//*_showSnackBar(error);
     setState(() {
       _isLoading = false;
-    });*/
+    });*//*
   }
 
   @override
   void onSaveSuccess(int result) async {
+    print("success on screen");
     //if (result > 1) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     //}
-  }
+  }*/
 }
