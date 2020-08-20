@@ -6,13 +6,8 @@ import 'package:registration_app/db/login_controller.dart';
 class LoginRequest {
   LoginCtr con = new LoginCtr();
 
-  /*Future<int> saveUser(String firstName, String lastName, String password, String image) {
-    var result = con.saveUser(new User(firstName, lastName, password, image));
-    return result;
-  }*/
-
-  Future<User> saveUser(String firstName, String lastName, String password) {
-    con.saveUser(new User(firstName, lastName, password));
+  Future<User> saveUser(String firstName, String lastName, String password, String image) {
+    con.saveUser(new User(firstName, lastName, password, image));
     return getUser(firstName, lastName, password);
   }
 

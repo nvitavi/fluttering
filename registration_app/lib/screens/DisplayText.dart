@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:registration_app/model/user.dart';
+import 'dart:convert';
 
 class DisplayText extends StatelessWidget {
-
   final User user;
 
   DisplayText({Key key, @required this.user}) : super(key: key);
@@ -45,7 +45,10 @@ class DisplayText extends StatelessWidget {
                           fontWeight: FontWeight.bold))
                 ]),
           ),
-        )
+        ),
+        Image.memory(
+          base64Decode(user.image),
+        ),
       ],
     );
   }

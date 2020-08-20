@@ -11,17 +11,10 @@ class SaveResponse {
   LoginRequest loginRequest = new LoginRequest();
   SaveResponse(this._callBack);
 
-  doSave(String firstName, String lastName, String password) {
-    loginRequest
-        .saveUser(firstName, lastName, password)
-        .then((result) => _callBack.onSaveSuccess(result))
-        .catchError((onError) => _callBack.onError(onError.toString()));
-  }
-
-  /*doSave(String firstName, String lastName, String password, String image) {
+  doSave(String firstName, String lastName, String password, String image) {
     loginRequest
         .saveUser(firstName, lastName, password, image)
         .then((result) => _callBack.onSaveSuccess(result))
         .catchError((onError) => _callBack.onError(onError.toString()));
-  }*/
+  }
 }

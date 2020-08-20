@@ -48,8 +48,7 @@ class DatabaseHelper {
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
         return db.execute(
-          //"CREATE TABLE user(id INTEGER PRIMARY KEY, first_name TEXT,last_name TEXT, password TEXT,image TEXT)",
-          "CREATE TABLE user(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, password TEXT)",
+          "CREATE TABLE user(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, password TEXT, image TEXT)",
         );
       },
       // Set the version. This executes the onCreate function and provides a

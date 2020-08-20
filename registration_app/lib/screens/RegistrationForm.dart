@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:registration_app/screens/AnimatedProgressIndicator.dart';
 import 'package:registration_app/model/user.dart';
 import 'package:registration_app/db/save_response.dart';
-
 import 'DisplayScreen.dart';
 
 class RegistrationForm extends StatefulWidget {
@@ -15,6 +15,7 @@ class RegistrationForm extends StatefulWidget {
 class _RegistrationForm extends State<RegistrationForm>
     implements SaveCallBack {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
   final _firstNameTextController = TextEditingController();
   final _lastNameTextController = TextEditingController();
   final _imageTextController = TextEditingController();
@@ -42,14 +43,10 @@ class _RegistrationForm extends State<RegistrationForm>
     setState(() {
       _formProgress = progress;
     });
-
-    // To validate password field
-    //_form.currentState.validate();
   }
 
   BuildContext _ctx;
   bool _isLoading = false;
-  final scaffoldKey = new GlobalKey<ScaffoldState>();
 
   String _firstName, _lastName, _password, _image;
 
@@ -66,7 +63,7 @@ class _RegistrationForm extends State<RegistrationForm>
       setState(() {
         _isLoading = true;
         form.save();
-        _response.doSave(_firstName, _lastName, _password);
+        _response.doSave(_firstName, _lastName, _password, _image);
       });
     }
   }
@@ -77,149 +74,116 @@ class _RegistrationForm extends State<RegistrationForm>
     ));
   }
 
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = base64.encode(File(pickedFile.path).readAsBytesSync());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     _ctx = context;
     return Form(
       key: _form,
       onChanged: _updateFormProgress,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedProgressIndicator(value: _formProgress),
-          Text('Sign up', style: Theme.of(context).textTheme.headline4),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _firstNameTextController,
-              decoration: InputDecoration(hintText: 'First name'),
-              onSaved: (val) => _firstName = val,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _lastNameTextController,
-              decoration: InputDecoration(hintText: 'Last name'),
-              onSaved: (val) => _lastName = val,
-            ),
-          ),
-          /*Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                showImage(),
-                RaisedButton(
-                  child: Text("Select Image from Gallery"),
-                  onPressed: () {
-                    pickImageFromGallery(ImageSource.gallery);
-                  },
+      child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedProgressIndicator(value: _formProgress),
+              Text('Sign up', style: Theme.of(context).textTheme.headline4),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _firstNameTextController,
+                  decoration: InputDecoration(hintText: 'First name'),
+                  onSaved: (val) => _firstName = val,
                 ),
-              ],
-            ),
-          ),*/
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextFormField(
-              obscureText: true,
-              controller: _passwordTextController,
-              decoration: InputDecoration(hintText: 'Password'),
-            ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _lastNameTextController,
+                  decoration: InputDecoration(hintText: 'Last name'),
+                  onSaved: (val) => _lastName = val,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FloatingActionButton(
+                      onPressed: getImage,
+                      tooltip: 'Pick Image',
+                      child: Icon(Icons.add_a_photo),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextFormField(
+                  obscureText: true,
+                  controller: _passwordTextController,
+                  decoration: InputDecoration(hintText: 'Password'),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextFormField(
+                    obscureText: true,
+                    controller: _confirmTextController,
+                    decoration: InputDecoration(hintText: 'Confirm Password'),
+                    onSaved: (val) => _password = val,
+                    validator: (val) {
+                      if (val.isEmpty) return 'Empty';
+                      if (val != _passwordTextController.text)
+                        return 'Passwords need to match';
+                      return null;
+                    }),
+              ),
+              FlatButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                onPressed: _formProgress == 1 ? _submit : null,
+                child: Text('Sign up'),
+              ),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: TextFormField(
-                obscureText: true,
-                controller: _confirmTextController,
-                decoration: InputDecoration(hintText: 'Confirm Password'),
-                onSaved: (val) => _password = val,
-                validator: (val) {
-                  if (val.isEmpty) return 'Empty';
-                  if (val != _passwordTextController.text)
-                    return 'Passwords need to match';
-                  return null;
-                }),
-          ),
-          FlatButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            onPressed: _formProgress == 1 ? _submit : null,
-            child: Text('Sign up'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<File> imageFile;
-
-  pickImageFromGallery(ImageSource source) {
-    setState(() {
-      imageFile = ImagePicker.pickImage(source: source);
-    });
-  }
-
-  Widget showImage() {
-    return FutureBuilder<File>(
-      future: imageFile,
-      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.data != null) {
-          return Image.file(
-            snapshot.data,
-            width: 300,
-            height: 300,
-          );
-        } else if (snapshot.error != null) {
-          return const Text(
-            'Error Picking Image',
-            textAlign: TextAlign.center,
-          );
-        } else {
-          return const Text(
-            'No Image Selected',
-            textAlign: TextAlign.center,
-          );
-        }
-      },
+        );
+      }),
     );
   }
 
   @override
   void onError(String error) {
     print("error occurred in db: " + error);
+    //_showSnackBar("Login Failed!");
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   void onSaveSuccess(User result) {
-    if(result != null){
+    if (result != null) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => DisplayScreen(user: result)),
       );
     } else {
-
+      print("Registration Failed!");
+      //_showSnackBar("Registration Failed!");
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
-
-/*  @override
-  void onError(String error) {
-    print(error);
-    *//*_showSnackBar(error);
-    setState(() {
-      _isLoading = false;
-    });*//*
-  }
-
-  @override
-  void onSaveSuccess(int result) async {
-    print("success on screen");
-    //if (result > 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    //}
-  }*/
 }

@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:registration_app/model/user.dart';
 import 'package:registration_app/db/login_request.dart';
 
